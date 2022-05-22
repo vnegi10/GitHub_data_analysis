@@ -350,7 +350,7 @@ function plot_all_issues(repo_list::Vector{String},
 			num_closed_issues = get_closed_issues(repo, myauth)
 			
 			push!(num_open, num_open_issues)
-			push!(num_closed, num_clsoed_issues)
+			push!(num_closed, num_closed_issues)
 			push!(repo_names, splitpath(repo)[2])
 		catch
 			continue
@@ -358,8 +358,8 @@ function plot_all_issues(repo_list::Vector{String},
 	end
 
 	df_issues = DataFrame(repo_names = repo_names, 
-		                  open = num_open,
-	                      closed = num_closed)
+		                  open = num_open, 
+		                  closed = num_closed)
 
 	sdf_issues = stack(df_issues, Not([:repo_names]), variable_name = :issue_state)
 
@@ -378,7 +378,7 @@ function plot_all_issues(repo_list::Vector{String},
 end	
 
 # ╔═╡ f0413e1b-ce8b-424b-890d-530d4dc2c1b2
-
+plot_all_issues(julia_list, myauth)
 
 # ╔═╡ 93af6d71-128d-48cc-872f-68351a3bbeed
 
