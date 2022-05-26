@@ -420,13 +420,60 @@ function plot_num_stars(repo_list::Vector{String},
 	        x = {"repo_names:o", "axis" = {"title" = "Repository name", "labelFontSize" = 12, "titleFontSize" = 14}},
 	        y = {:num_stars, "axis" = {"title" = "Number of stars", "labelFontSize" = 12, "titleFontSize" = 14}},
 	        width = 750, height = 500, 
-			"title" = {"text" = "Open source love", "fontSize" = 16})
+			"title" = {"text" = "Open source love 😄", "fontSize" = 16})
 
 	return figure
 end	
 
 # ╔═╡ a06eaf3a-f9f3-4151-a1e9-e34200c84705
 plot_num_stars(julia_list, myauth)
+
+# ╔═╡ 7d39b624-38be-45b4-97c1-a51744f6fc40
+md"
+##### Number of watchers
+"
+
+# ╔═╡ be8a7d8e-8454-4517-8580-1094bb11104e
+function get_num_watchers(repo::String, myauth::GitHub.OAuth2)
+
+	watch_params = Dict("page" => 1);
+	num_watchers = watchers(repo, auth = myauth, params = watch_params)[1] |> length
+
+	return num_watchers
+end	
+
+# ╔═╡ ca9d5909-cce4-4490-b21b-ff522eb8d654
+function plot_num_watchers(repo_list::Vector{String}, 
+	                       myauth::GitHub.OAuth2)
+
+	watchers      = Int64[]
+	repo_names    = String[]
+
+	for repo in repo_list
+		try
+			watch = get_num_watchers(repo, myauth)
+			push!(watchers, watch)
+			push!(repo_names, splitpath(repo)[2])
+		catch
+			continue
+		end
+	end
+
+	df_watch = DataFrame(repo_names = repo_names, num_watchers = watchers)
+
+	figure = df_watch |>
+
+	@vlplot(:bar, 
+	        x = {"repo_names:o", "axis" = {"title" = "Repository name", "labelFontSize" = 12, "titleFontSize" = 14}},
+	        y = {:num_watchers, "axis" = {"title" = "Number of watchers", "labelFontSize" = 12, "titleFontSize" = 14}},
+	        width = 750, height = 500, 
+			"title" = {"text" = "Repository subscription activity", "fontSize" = 16})
+
+	return figure
+end	
+
+# ╔═╡ a7e5ee5e-0385-40d7-bede-9c79d76294a4
+plot_num_watchers(julia_list, myauth)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -901,5 +948,9 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─21a7b328-7267-4dda-9e43-8b46884ec099
 # ╟─6bc90c3c-a64a-43fd-9dde-c39eaa36d703
 # ╠═a06eaf3a-f9f3-4151-a1e9-e34200c84705
+# ╟─7d39b624-38be-45b4-97c1-a51744f6fc40
+# ╟─be8a7d8e-8454-4517-8580-1094bb11104e
+# ╟─ca9d5909-cce4-4490-b21b-ff522eb8d654
+# ╠═a7e5ee5e-0385-40d7-bede-9c79d76294a4
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
