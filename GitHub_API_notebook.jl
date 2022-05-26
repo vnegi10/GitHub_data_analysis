@@ -118,6 +118,7 @@ julia_list = ["JuliaWeb/HTTP.jl",
 	          "JuliaData/CSV.jl",
 	          "JuliaData/YAML.jl",
 	          "JuliaData/RData.jl",
+	          "JuliaPy/PyCall.jl",
 	          "queryverse/VegaLite.jl",
 	          "queryverse/Query.jl",
               "JuliaPlots/Plots.jl",
@@ -381,7 +382,51 @@ end
 plot_all_issues(julia_list, myauth)
 
 # ╔═╡ 93af6d71-128d-48cc-872f-68351a3bbeed
+md"
+##### Number of stargazers
+"
 
+# ╔═╡ 21a7b328-7267-4dda-9e43-8b46884ec099
+function get_num_stargazers(repo::String, myauth::GitHub.OAuth2)
+
+	star_params = Dict("page" => 1);
+	num_stars = stargazers(repo, auth = myauth, params = star_params)[1] |> length
+
+	return num_stars
+end	
+
+# ╔═╡ 6bc90c3c-a64a-43fd-9dde-c39eaa36d703
+function plot_num_stars(repo_list::Vector{String}, 
+	                    myauth::GitHub.OAuth2)
+
+	stars      = Int64[]
+	repo_names = String[]
+
+	for repo in repo_list
+		try
+			star = get_num_stargazers(repo, myauth)
+			push!(stars, star)
+			push!(repo_names, splitpath(repo)[2])
+		catch
+			continue
+		end
+	end
+
+	df_star = DataFrame(repo_names = repo_names, num_stars = stars)
+
+	figure = df_star |>
+
+	@vlplot(:bar, 
+	        x = {"repo_names:o", "axis" = {"title" = "Repository name", "labelFontSize" = 12, "titleFontSize" = 14}},
+	        y = {:num_stars, "axis" = {"title" = "Number of stars", "labelFontSize" = 12, "titleFontSize" = 14}},
+	        width = 750, height = 500, 
+			"title" = {"text" = "Open source love", "fontSize" = 16})
+
+	return figure
+end	
+
+# ╔═╡ a06eaf3a-f9f3-4151-a1e9-e34200c84705
+plot_num_stars(julia_list, myauth)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -852,6 +897,9 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─fb347218-25bf-4369-abe1-671786e400f1
 # ╟─0abc2a1f-1c77-4138-b4b3-29c3e0b5e4f9
 # ╠═f0413e1b-ce8b-424b-890d-530d4dc2c1b2
-# ╠═93af6d71-128d-48cc-872f-68351a3bbeed
+# ╟─93af6d71-128d-48cc-872f-68351a3bbeed
+# ╟─21a7b328-7267-4dda-9e43-8b46884ec099
+# ╟─6bc90c3c-a64a-43fd-9dde-c39eaa36d703
+# ╠═a06eaf3a-f9f3-4151-a1e9-e34200c84705
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
