@@ -26,12 +26,14 @@ md"
 
 # ╔═╡ e2f92cb3-1fdc-4d2d-90a0-92c3f7b72967
 begin
-	access_token = JSON.parsefile("/home/vikas/Documents/Input_JSON/VNEG_github_auth.json")
-	myauth = GitHub.authenticate(access_token["GITHUB_AUTH"])
+	access_token = JSON.parsefile("/home/vikas/Documents/Input_JSON/VNEG_github_auth.json")	
 end
 
 # ╔═╡ ac855f25-d71e-42b3-bab6-16b865a46759
-typeof(myauth)
+begin
+	myauth = GitHub.authenticate(access_token["GITHUB_AUTH"])
+	typeof(myauth)
+end
 
 # ╔═╡ 0116a5fc-b43e-4712-b0cc-8c8b729bfbd8
 md"
@@ -44,7 +46,7 @@ repo = "JuliaData/DataFrames.jl"
 # ╔═╡ 339b249d-3636-43e1-aede-5b441917917c
 begin
 	contri_params = Dict("page" => 1);
-	contributors(repo, params = contri_params)
+	contributors(repo, auth = myauth, params = contri_params)
 end
 
 # ╔═╡ a3bc140a-ad03-4a86-8d18-48edc00ab9d3
@@ -124,7 +126,12 @@ julia_list = ["JuliaWeb/HTTP.jl",
               "JuliaPlots/Plots.jl",
               "JuliaPlots/StatsPlots.jl",
               "JuliaPlots/Makie.jl",
-              "JuliaPlots/PlotlyJS.jl"]
+              "JuliaPlots/PlotlyJS.jl",
+              "JuliaPlots/UnicodePlots.jl",
+              "JuliaMath/Combinatorics.jl",
+	          "JuliaMath/FFTW.jl",
+              "SciML/DifferentialEquations.jl",
+              "SciML/ModelingToolkit.jl"]
 
 # ╔═╡ e12171f2-a769-4f74-9bf9-c4ee77b5a568
 julia_list_data = ["JuliaData/DataFrames.jl",
@@ -136,7 +143,8 @@ julia_list_data = ["JuliaData/DataFrames.jl",
 julia_list_plotting = ["JuliaPlots/Plots.jl",
               		   "JuliaPlots/StatsPlots.jl",
               		   "JuliaPlots/Makie.jl",
-                       "JuliaPlots/PlotlyJS.jl"]
+                       "JuliaPlots/PlotlyJS.jl",
+                       "JuliaPlots/UnicodePlots.jl"]
 
 # ╔═╡ cbed0197-caec-4b0b-a802-663fbe0236a0
 md"
@@ -184,7 +192,7 @@ function plot_num_contributors(repo_list::Vector{String},
 end	
 
 # ╔═╡ 6612d86f-81a4-45a0-b321-4d57b8ececed
-plot_num_contributors(julia_list, myauth)
+figure1 = plot_num_contributors(julia_list, myauth)
 
 # ╔═╡ f50b06df-c843-4d26-8389-f7888920bb11
 md"
@@ -231,7 +239,7 @@ function plot_num_forks(repo_list::Vector{String},
 end	
 
 # ╔═╡ fe3edcea-d3b2-45b6-b5b6-412f10a79ee4
-plot_num_forks(julia_list, myauth)
+figure2 = plot_num_forks(julia_list, myauth)
 
 # ╔═╡ c9753306-7c06-4154-9d9a-466a75e6e667
 md"
@@ -241,7 +249,8 @@ md"
 # ╔═╡ 49fb3222-c1fb-400c-8a0f-ee9fd9b1b9f2
 function get_weekly_commit_count(repo::String, myauth::GitHub.OAuth2)
 
-	stats_dict = stats(repo, auth = myauth, "participation").body |> String |> JSON.parse
+	stats_dict = stats(repo, auth = myauth, "participation").body |> 
+	             String |> JSON.parse
 
 	commits  = stats_dict["all"]
 	df_count = DataFrame(week = collect(1:length(commits)),
@@ -301,10 +310,10 @@ function plot_weekly_commits(repo_list::Vector{String},
 end	
 
 # ╔═╡ a9c733a1-576b-4f8d-975d-dd3bb7fcd21a
-plot_weekly_commits(julia_list_data, myauth)
+figure3= plot_weekly_commits(julia_list_data, myauth)
 
 # ╔═╡ e04e568e-452c-4ac9-8738-84f8d69c72b6
-plot_weekly_commits(julia_list_plotting, myauth)
+figure4 = plot_weekly_commits(julia_list_plotting, myauth)
 
 # ╔═╡ 3b7ee27e-a171-49c1-acf2-b6dac57a98d8
 md"
@@ -379,7 +388,7 @@ function plot_all_issues(repo_list::Vector{String},
 end	
 
 # ╔═╡ f0413e1b-ce8b-424b-890d-530d4dc2c1b2
-plot_all_issues(julia_list, myauth)
+figure5 = plot_all_issues(julia_list, myauth)
 
 # ╔═╡ 93af6d71-128d-48cc-872f-68351a3bbeed
 md"
@@ -426,7 +435,7 @@ function plot_num_stars(repo_list::Vector{String},
 end	
 
 # ╔═╡ a06eaf3a-f9f3-4151-a1e9-e34200c84705
-plot_num_stars(julia_list, myauth)
+figure6 = plot_num_stars(julia_list, myauth)
 
 # ╔═╡ 7d39b624-38be-45b4-97c1-a51744f6fc40
 md"
@@ -473,7 +482,7 @@ function plot_num_watchers(repo_list::Vector{String},
 end	
 
 # ╔═╡ a7e5ee5e-0385-40d7-bede-9c79d76294a4
-plot_num_watchers(julia_list, myauth)
+figure7 = plot_num_watchers(julia_list, myauth)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -903,7 +912,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═010af338-d901-11ec-3d35-a964bb75c8bf
 # ╟─0c06977f-ead5-40c8-9e7c-ecd491508613
 # ╟─582bf436-8b7a-49f7-b81d-a676570644de
-# ╟─e2f92cb3-1fdc-4d2d-90a0-92c3f7b72967
+# ╠═e2f92cb3-1fdc-4d2d-90a0-92c3f7b72967
 # ╠═ac855f25-d71e-42b3-bab6-16b865a46759
 # ╟─0116a5fc-b43e-4712-b0cc-8c8b729bfbd8
 # ╠═a9cab907-c5d4-439e-be65-5c258daa961d
@@ -927,8 +936,8 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═e12171f2-a769-4f74-9bf9-c4ee77b5a568
 # ╠═81c44409-06e4-4d23-9c5d-61897c988c7b
 # ╟─cbed0197-caec-4b0b-a802-663fbe0236a0
-# ╟─3904aaf0-630c-4b91-b35d-a2f4d1b48373
-# ╟─867ad62f-ce00-4ee0-ae1d-5dd9b3b9b465
+# ╠═3904aaf0-630c-4b91-b35d-a2f4d1b48373
+# ╠═867ad62f-ce00-4ee0-ae1d-5dd9b3b9b465
 # ╠═6612d86f-81a4-45a0-b321-4d57b8ececed
 # ╟─f50b06df-c843-4d26-8389-f7888920bb11
 # ╟─52a38c06-25c5-4a61-90cf-a7bf4a4fbbf5
